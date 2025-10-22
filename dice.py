@@ -4,12 +4,26 @@ import random, math
 
 BG_COLOR = "#000000"
 DICE_SIZE = 44
-dice_x = 100
-dice_y = 710
 is_animating = False
 current_img = None
 start_pos = None
 dragging = False
+
+
+def reset(event=None):
+    global dice_item, is_animating, current_img, dice_x, dice_y
+    current_img = dice_image(1)
+    dice_x = screen_w / 2
+    dice_y = screen_h - 69
+    dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
+    is_animating = False
+
+    canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
+    canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
+    canvas.tag_bind(dice_item, "<ButtonRelease-1>", roll_dice)
+    canvas.tag_bind(dice_item, "<ButtonPress-3>", start_drag)
+    canvas.tag_bind(dice_item, "<B3-Motion>", on_drag)
+    canvas.tag_bind(dice_item, "<ButtonRelease-3>", roll_dice_6)
 
 
 def dice_image(num, angle=0):
@@ -61,22 +75,6 @@ def dice_image(num, angle=0):
 
     rotated = img.rotate(-angle, resample=Image.BICUBIC, expand=True)  # type: ignore
     return ImageTk.PhotoImage(rotated)
-
-
-def reset(event=None):
-    global dice_item, is_animating, current_img, dice_x, dice_y
-    current_img = dice_image(1)
-    dice_x = 100
-    dice_y = 710
-    dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
-    is_animating = False
-
-    canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
-    canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
-    canvas.tag_bind(dice_item, "<ButtonRelease-1>", roll_dice)
-    canvas.tag_bind(dice_item, "<ButtonPress-3>", start_drag)
-    canvas.tag_bind(dice_item, "<B3-Motion>", on_drag)
-    canvas.tag_bind(dice_item, "<ButtonRelease-3>", roll_dice_6)
 
 
 def start_drag(event):
@@ -156,7 +154,6 @@ def animate(y, v, num, d, ground, angle=0):
         is_animating = False
 
 
-# === 主程式 ===
 root = tk.Tk()
 root.overrideredirect(True)
 root.config(bg=BG_COLOR)
