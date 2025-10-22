@@ -1,8 +1,8 @@
 # 2D-dice-on-desktop
 A small dice witch can be thrown by clicking or dragging it.  
 
-<p align="center">
-  <img src="./5c81d2f3-a1f2-4f55-88e4-78b242df594a.png" width="600">
+<p>
+  <img src="./image/screenshot.gif" width="600">
 </p>
 
 <br>
@@ -65,4 +65,4 @@ python dice.py
 This project is released under the MIT License.  
 You are free to use, modify, and share it for learning or personal projects.  
   
-**Sometimes even a small dice can roll big ideas. Who knows how this project will turn out.**
+**Sometimes even a small dice can roll big ideas. Who knows how this project will turn out!?**
