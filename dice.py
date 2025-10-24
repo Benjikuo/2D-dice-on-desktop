@@ -4,8 +4,6 @@ import random, math
 
 BG_COLOR = "#000000"
 DICE_SIZE = 44
-dice_x = 100
-dice_y = 710
 is_animating = False
 current_img = None
 start_pos = None
@@ -67,8 +65,8 @@ def dice_image(num, angle=0):
 def reset(event=None):
     global dice_item, is_animating, current_img, dice_x, dice_y, final_num
     current_img = dice_image(final_num)
-    dice_x = 100
-    dice_y = 710
+    dice_x = screen_w / 2
+    dice_y = screen_h - 70
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
     is_animating = False
 
@@ -113,7 +111,8 @@ def roll_dice_6(event=None):
 
 
 def key_pressed(event):
-    global final_num
+    global final_num, dragging
+    dragging = False
     key = event.keysym.lower()
 
     if key in ["1", "2", "3", "4", "5", "6"]:
@@ -134,7 +133,7 @@ def roll_dice(event=None):
     is_animating = True
 
     v = 0 if dragging else -25
-    ground = 1010 if dragging else dice_y
+    ground = 1010
     d = random.choice([-25, 25])
 
     animate(dice_y, v, final_num, d, ground)
@@ -173,6 +172,9 @@ root.wm_attributes("-transparentcolor", BG_COLOR)
 screen_w = root.winfo_screenwidth()
 screen_h = root.winfo_screenheight()
 root.geometry(f"{screen_w}x{screen_h}+0+0")
+
+dice_x = screen_w / 2
+dice_y = screen_h - 70
 
 canvas = tk.Canvas(root, bg=BG_COLOR, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
