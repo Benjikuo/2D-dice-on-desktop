@@ -35,7 +35,7 @@ A small dice witch can be thrown by clicking or dragging it.
 ## ⚙️ Requirements
 Install dependencies before running:
 ```bash
-pip install pillow opencv-python numpy
+pip install pillow
 ```
 
 <br>
