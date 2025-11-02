@@ -25,9 +25,9 @@ A small dice witch can be thrown by clicking or dragging it.
 ## 📂 Project Structure
 ```
 2D-dice-on-desktop/
-├── dice.py         # Main executable script
-├── README.md       # Project documentation
-└── LICENSE         # MIT license
+├── dice.py        # Main executable script
+├── README.md      # Project documentation
+└── LICENSE        # MIT license
 ```
 
 <br>
