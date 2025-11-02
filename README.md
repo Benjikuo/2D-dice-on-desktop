@@ -50,7 +50,7 @@ python dice.py
 
 <br>
 
-## ⌨️ Control
+## 💻 Keyboard and Mouse Controls
 | Action         | Mouse / Key             | Description       |
 |----------------| ------------------------|-------------------|
 | 🎲 Roll Dice   | Left-click / R          | Roll randomly     |
