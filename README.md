@@ -57,7 +57,7 @@ python dice.py
 | 🎯 Roll 6      | Right-click / 6         | Always land on 6  |
 | 🔢 Roll number | 1 ~ 6                   | Land on 1 ~ 6     |
 | 👆🏻 Drag        | Hold & move             | Move the dice     |
-| 🔁 Reset       | Ctrl + R / Middle-click | Reset position    |
+| 🔁 Reset       | Middle-click / Ctrl + R | Reset position    |
 | ❌ Exit        | Alt + F4                | Close the program |
 
 <br>
