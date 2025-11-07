@@ -53,7 +53,7 @@ python dice.py
 ## 💻 Keyboard and Mouse Controls
 | Action         | Mouse / Key             | Description       |
 |----------------| ------------------------|-------------------|
-| 🎲 Roll Dice   | Left-click / R          | Roll randomly     |
+| 🎲 Roll Dice   | Left-click / R or space | Roll randomly     |
 | 🎯 Roll 6      | Right-click / 6         | Always land on 6  |
 | 🔢 Roll number | 1 ~ 6                   | Land on 1 ~ 6     |
 | 👆🏻 Drag        | Hold & move             | Move the dice     |
