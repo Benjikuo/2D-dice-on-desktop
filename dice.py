@@ -4,11 +4,16 @@ import random, math
 
 BG_COLOR = "#000000"
 DICE_SIZE = 44
-is_animating = False
+dice_x = 100
+dice_y = 710
 current_img = None
 start_pos = None
 dragging = False
+moved = False
 final_num = 3
+last_dx = 0
+last_dy = 0
+jump = False
 
 
 def dice_image(num, angle=0):
@@ -63,12 +68,12 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_item, is_animating, current_img, dice_x, dice_y, final_num
-    current_img = dice_image(final_num)
+    global dice_item, current_img, dice_x, dice_y, final_num, moved
+    current_img = dice_image(3)
     dice_x = screen_w / 2
     dice_y = screen_h - 70
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
-    is_animating = False
+    moved = False
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
     canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
@@ -79,23 +84,26 @@ def reset(event=None):
 
 
 def start_drag(event):
-    global start_pos, dragging
+    global start_pos, dragging, last_dx, last_dy
     start_pos = (event.x, event.y)
     dragging = False
 
 
 def on_drag(event):
-    global start_pos, dragging, dice_x, dice_y
+    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved
+    moved = True
     if start_pos:
         dx = event.x - start_pos[0]
         dy = event.y - start_pos[1]
         dist = math.hypot(dx, dy)
-        if dist > 5:
+        if dist > 10:
             dragging = True
             canvas.move(dice_item, dx, dy)
+            start_pos = (event.x, event.y)
             dice_x += dx
             dice_y += dy
-            start_pos = (event.x, event.y)
+            last_dx = dx
+            last_dy = dy
 
 
 def roll_dice_random(event=None):
@@ -112,12 +120,15 @@ def roll_dice_6(event=None):
 
 def key_pressed(event):
     global final_num, dragging
+    if dragging:
+        return
+
     dragging = False
     key = event.keysym.lower()
 
     if key in ["1", "2", "3", "4", "5", "6"]:
         final_num = int(key)
-    elif key == "r":
+    elif key == "r" or key == "space":
         final_num = random.randint(1, 6)
     else:
         return
@@ -126,42 +137,62 @@ def key_pressed(event):
 
 
 def roll_dice(event=None):
-    global dragging, dice_y, is_animating, final_num
+    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump
 
-    if is_animating:
+    if jump:
         return
-    is_animating = True
 
-    v = 0 if dragging else -25
-    ground = 1010
+    vx = last_dx if dragging else 0
+    vy = 0 + last_dy if dragging else -25
+    ground = 1010 if moved else dice_y
     d = random.choice([-25, 25])
 
-    animate(dice_y, v, final_num, d, ground)
+    jump = False if dragging else True
+    dragging = False
+    animate(dice_y, vx, vy, final_num, d, ground)
 
 
-def animate(y, v, num, d, ground, angle=0):
-    global is_animating, current_img, dice_x, dice_y
-    if not is_animating:
+def animate(y, vx, vy, num, d, ground, angle=0):
+    global current_img, dice_x, dice_y, dragging, jump
+
+    if dragging:
         return
 
-    g = 2.2
-    v += g
-    y += v
+    g = 2.5
+    damping = 0.4
+    left_wall = 22
+    right_wall = screen_w - left_wall
+    ceiling = 0
+
+    dice_x += vx
+    vy += g
+    y += vy
     angle += d
 
-    canvas.coords(dice_item, dice_x, y)
+    if dice_x <= left_wall or dice_x >= right_wall:
+        vx = -vx * damping
+        dice_x = max(left_wall, min(right_wall, dice_x))
 
+    if y <= ceiling:
+        y = ceiling
+        vy = -vy
+
+    if y >= ground:
+        vx = vx * damping
+        vy = -vy * damping
+        y = ground
+        if abs(vy) + abs(vx) * 0.1 < 5:
+            jump = False
+            dice_y = ground
+            canvas.coords(dice_item, dice_x, dice_y)
+            current_img = dice_image(num)
+            canvas.itemconfig(dice_item, image=current_img)
+            return
+
+    canvas.coords(dice_item, dice_x, y)
     current_img = dice_image(random.randint(1, 6), angle)
     canvas.itemconfig(dice_item, image=current_img)
-
-    if y < ground:
-        root.after(20, lambda: animate(y, v, num, d, ground, angle))
-    else:
-        dice_y = ground
-        canvas.coords(dice_item, dice_x, dice_y)
-        current_img = dice_image(num)
-        canvas.itemconfig(dice_item, image=current_img)
-        is_animating = False
+    root.after(20, lambda: animate(y, vx, vy, num, d, ground, angle))
 
 
 root = tk.Tk()
@@ -173,9 +204,6 @@ screen_w = root.winfo_screenwidth()
 screen_h = root.winfo_screenheight()
 root.geometry(f"{screen_w}x{screen_h}+0+0")
 
-dice_x = screen_w / 2
-dice_y = screen_h - 70
-
 canvas = tk.Canvas(root, bg=BG_COLOR, highlightthickness=0)
 canvas.pack(fill="both", expand=True)
 
@@ -185,3 +213,7 @@ root.bind("<Key>", key_pressed)
 root.bind("<Control-r>", reset)
 root.bind("<ButtonPress-2>", reset)
 root.mainloop()
+
+
+dice_x = screen_w / 2
+dice_y = screen_h - 70
