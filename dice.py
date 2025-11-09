@@ -8,7 +8,7 @@ dice_x = 100
 dice_y = 710
 current_img = None
 start_pos = None
-dragging = False
+dragging = True
 moved = False
 final_num = 3
 last_dx = 0
@@ -68,12 +68,16 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_item, current_img, dice_x, dice_y, final_num, moved
+    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy
     current_img = dice_image(3)
+    dragging = True
+    moved = False
+    jump = False
+    last_dx = 0
+    last_dy = 0
     dice_x = screen_w / 2
     dice_y = screen_h - 70
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
-    moved = False
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
     canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
@@ -90,8 +94,9 @@ def start_drag(event):
 
 
 def on_drag(event):
-    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved
+    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved, jump
     moved = True
+    jump = False
     if start_pos:
         dx = event.x - start_pos[0]
         dy = event.y - start_pos[1]
@@ -119,8 +124,8 @@ def roll_dice_6(event=None):
 
 
 def key_pressed(event):
-    global final_num, dragging
-    if dragging:
+    global final_num, dragging, jump
+    if dragging or jump:
         return
 
     dragging = False
@@ -138,9 +143,6 @@ def key_pressed(event):
 
 def roll_dice(event=None):
     global dragging, dice_y, final_num, last_dx, last_dy, moved, jump
-
-    if jump:
-        return
 
     vx = last_dx if dragging else 0
     vy = 0 + last_dy if dragging else -25
@@ -213,7 +215,3 @@ root.bind("<Key>", key_pressed)
 root.bind("<Control-r>", reset)
 root.bind("<ButtonPress-2>", reset)
 root.mainloop()
-
-
-dice_x = screen_w / 2
-dice_y = screen_h - 70
