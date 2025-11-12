@@ -1,5 +1,5 @@
 # 2D-dice-on-desktop
-A small dice on desktop witch can be thrown by clicking or dragging it.  
+A small dice on desktop which can be thrown by clicking or dragging it.  
 
 <p>
   <img src="./image/screenshot.gif" width="600">
