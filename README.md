@@ -63,7 +63,7 @@ python dice.py
 <br>
 
 ## 📜 License  
-This project is released under the MIT License.  
+This project is released under the **MIT License**.  
 You are free to use, modify, and share it for learning or personal projects.  
   
 **Sometimes even a small dice can roll big ideas. Who knows how this project will turn out!?**
