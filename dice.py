@@ -75,8 +75,8 @@ def reset(event=None):
     jump = False
     last_dx = 0
     last_dy = 0
-    dice_x = screen_w / 2
-    dice_y = screen_h - 70
+    dice_x = 100
+    dice_y = 710
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
@@ -145,7 +145,7 @@ def roll_dice(event=None):
     global dragging, dice_y, final_num, last_dx, last_dy, moved, jump
 
     vx = last_dx if dragging else 0
-    vy = 0 + last_dy if dragging else -25
+    vy = 0 + last_dy if dragging else -30
     ground = 1010 if moved else dice_y
     d = random.choice([-25, 25])
 
@@ -194,7 +194,7 @@ def animate(y, vx, vy, num, d, ground, angle=0):
     canvas.coords(dice_item, dice_x, y)
     current_img = dice_image(random.randint(1, 6), angle)
     canvas.itemconfig(dice_item, image=current_img)
-    root.after(20, lambda: animate(y, vx, vy, num, d, ground, angle))
+    root.after(5, lambda: animate(y, vx, vy, num, d, ground, angle))
 
 
 root = tk.Tk()
