@@ -24,7 +24,7 @@ A small dice on desktop which can be thrown by clicking or dragging it.
 
 ## 📂 Project Structure
 ```
-2D-dice-on-desktop/
+Desktop dice/
 ├── dice.py        # Main executable script
 ├── LICENSE        # MIT license
 └── README.md      # Project documentation
