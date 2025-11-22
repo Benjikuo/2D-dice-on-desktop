@@ -104,6 +104,7 @@ def on_drag(event):
         dx = event.x - start_pos[0]
         dy = event.y - start_pos[1]
         dist = math.hypot(dx, dy)
+
         if dist > 10:
             dragging = True
             canvas.move(dice_item, dx, dy)
@@ -113,11 +114,10 @@ def on_drag(event):
             last_dx = dx
             last_dy = dy
 
-            speed = math.hypot(dx, dy)
-            if speed > 30:
-                current_img = dice_image(final_num, dice_angle)
-                canvas.itemconfig(dice_item, image=current_img)
-                dice_angle += 30
+        if dist > 30:
+            current_img = dice_image(final_num, dice_angle)
+            canvas.itemconfig(dice_item, image=current_img)
+            dice_angle += 30
 
 
 def roll_dice_random(event=None):
