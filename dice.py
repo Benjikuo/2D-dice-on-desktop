@@ -105,7 +105,7 @@ def on_drag(event):
         dy = event.y - start_pos[1]
         dist = math.hypot(dx, dy)
 
-        if dist > 10:
+        if dist > 5:
             dragging = True
             canvas.move(dice_item, dx, dy)
             start_pos = (event.x, event.y)
