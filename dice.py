@@ -4,8 +4,10 @@ import random, math
 
 BG_COLOR = "#000000"
 DICE_SIZE = 44
-dice_x = 100
-dice_y = 710
+
+dice_x = 0
+dice_y = 0
+dice_angle = 0
 current_img = None
 start_pos = None
 dragging = True
@@ -68,15 +70,16 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy
-    current_img = dice_image(3)
+    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy, dice_angle, final_num
+    current_img = dice_image(final_num)
     dragging = True
     moved = False
     jump = False
     last_dx = 0
     last_dy = 0
-    dice_x = 100
-    dice_y = 710
+    dice_x = screen_w // 2
+    dice_y = screen_h - 70
+    dice_angle = 0
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
@@ -94,7 +97,7 @@ def start_drag(event):
 
 
 def on_drag(event):
-    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved, jump
+    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved, jump, dice_angle, current_img
     moved = True
     jump = False
     if start_pos:
@@ -109,6 +112,12 @@ def on_drag(event):
             dice_y += dy
             last_dx = dx
             last_dy = dy
+
+            speed = math.hypot(dx, dy)
+            if speed > 30:
+                current_img = dice_image(final_num, dice_angle)
+                canvas.itemconfig(dice_item, image=current_img)
+                dice_angle += 30
 
 
 def roll_dice_random(event=None):
@@ -142,16 +151,16 @@ def key_pressed(event):
 
 
 def roll_dice(event=None):
-    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump
+    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump, dice_angle
 
     vx = last_dx if dragging else 0
     vy = 0 + last_dy if dragging else -30
-    ground = 1010 if moved else dice_y
+    ground = screen_h - 70 if moved else dice_y
     d = random.choice([-25, 25])
 
     jump = False if dragging else True
     dragging = False
-    animate(dice_y, vx, vy, final_num, d, ground)
+    animate(dice_y, vx, vy, final_num, d, ground, dice_angle)
 
 
 def animate(y, vx, vy, num, d, ground, angle=0):
