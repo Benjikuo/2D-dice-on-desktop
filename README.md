@@ -2,7 +2,7 @@
 A small dice on desktop which can be thrown by clicking or dragging it.  
 
 <p>
-  <img src="https://raw.githubusercontent.com/Benjikuo/2D-dice-on-desktop/refs/heads/main/image/drag_animation.gif" width="700">
+  <img src="https://raw.githubusercontent.com/Benjikuo/2D-dice-on-desktop/refs/heads/main/image/drag_animation.gif" width="800">
 </p>
 
 <br>
