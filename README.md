@@ -1,4 +1,8 @@
 # 2D-dice-on-desktop
+
+![License](https://img.shields.io/badge/license-MIT-yellow)
+![Language](https://img.shields.io/badge/language-python-blue)
+
 A small dice on desktop which can be thrown by clicking or dragging it.  
 
 <p>
