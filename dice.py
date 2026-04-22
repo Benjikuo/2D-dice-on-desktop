@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
-import random, math
+import random, math, time
 
 BG_COLOR = "#000000"
 DICE_SIZE = 44
@@ -16,6 +16,8 @@ final_num = 3
 last_dx = 0
 last_dy = 0
 jump = False
+
+last_time = time.time()
 
 
 def dice_image(num, angle=0):
@@ -70,7 +72,8 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy, dice_angle, final_num
+    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy, dice_angle, final_num, last_time
+    final_num = 3
     current_img = dice_image(final_num)
     dragging = True
     moved = False
@@ -104,8 +107,7 @@ def on_drag(event):
         dx = event.x - start_pos[0]
         dy = event.y - start_pos[1]
         dist = math.hypot(dx, dy)
-
-        if dist > 5:
+        if dist > 10:
             dragging = True
             canvas.move(dice_item, dx, dy)
             start_pos = (event.x, event.y)
@@ -114,10 +116,15 @@ def on_drag(event):
             last_dx = dx
             last_dy = dy
 
-        if dist > 30:
-            current_img = dice_image(final_num, dice_angle)
-            canvas.itemconfig(dice_item, image=current_img)
-            dice_angle += 30
+            speed = math.hypot(dx, dy)
+            if speed > 30:
+                current_img = dice_image(final_num, dice_angle)
+                canvas.itemconfig(dice_item, image=current_img)
+                dice_angle += 30
+
+        else:
+            last_dx = 0
+            last_dy = 0
 
 
 def roll_dice_random(event=None):
@@ -151,10 +158,11 @@ def key_pressed(event):
 
 
 def roll_dice(event=None):
-    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump, dice_angle
+    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump, dice_angle, last_time
+    last_time = time.time()
 
     vx = last_dx if dragging else 0
-    vy = 0 + last_dy if dragging else -30
+    vy = 0 + last_dy if dragging else -150
     ground = screen_h - 70 if moved else dice_y
     d = random.choice([-25, 25])
 
@@ -164,33 +172,43 @@ def roll_dice(event=None):
 
 
 def animate(y, vx, vy, num, d, ground, angle=0):
-    global current_img, dice_x, dice_y, dragging, jump
+    global current_img, dice_x, dice_y, dragging, jump, last_time
 
     if dragging:
         return
 
-    g = 2.5
-    damping = 0.4
+    now = time.time()
+    dt = (now - last_time) * 33
+    last_time = now
+
+    g = 9.8
+    restitution = 0.6
+    friction = 0.5
     left_wall = 22
     right_wall = screen_w - left_wall
     ceiling = 0
 
-    dice_x += vx
-    vy += g
-    y += vy
-    angle += d
+    dice_x += vx * dt
+    vy += g * dt
+    y += vy * dt
+    angle += d * dt
 
     if dice_x <= left_wall or dice_x >= right_wall:
-        vx = -vx * damping
+        if dice_x == left_wall or dice_x == right_wall:
+            friction = 1
+
         dice_x = max(left_wall, min(right_wall, dice_x))
+        vx = -vx * restitution
+        vy = vy * friction
 
     if y <= ceiling:
         y = ceiling
-        vy = -vy
+        vx = vx * friction
+        vy = -vy * restitution
 
     if y >= ground:
-        vx = vx * damping
-        vy = -vy * damping
+        vx = vx * friction
+        vy = -vy * restitution
         y = ground
         if abs(vy) + abs(vx) * 0.1 < 5:
             jump = False
@@ -203,7 +221,7 @@ def animate(y, vx, vy, num, d, ground, angle=0):
     canvas.coords(dice_item, dice_x, y)
     current_img = dice_image(random.randint(1, 6), angle)
     canvas.itemconfig(dice_item, image=current_img)
-    root.after(5, lambda: animate(y, vx, vy, num, d, ground, angle))
+    root.after(16, lambda: animate(y, vx, vy, num, d, ground, angle))
 
 
 root = tk.Tk()
