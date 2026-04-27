@@ -159,10 +159,10 @@ def key_pressed(event):
 
 def roll_dice(event=None):
     global dragging, dice_y, final_num, last_dx, last_dy, moved, jump, dice_angle, last_time
-    last_time = time.time()
 
+    last_time = time.time() if dragging else 0
     vx = last_dx if dragging else 0
-    vy = 0 + last_dy if dragging else -150
+    vy = last_dy if dragging else -80
     ground = screen_h - 70 if moved else dice_y
     d = random.choice([-25, 25])
 
@@ -177,9 +177,11 @@ def animate(y, vx, vy, num, d, ground, angle=0):
     if dragging:
         return
 
-    now = time.time()
-    dt = (now - last_time) * 33
-    last_time = now
+    dt = 1
+    if last_time != 0:
+        now = time.time()
+        dt = (now - last_time) * 33
+        last_time = now
 
     g = 9.8
     restitution = 0.6
