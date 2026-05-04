@@ -5,19 +5,36 @@ import random, math, time
 BG_COLOR = "#000000"
 DICE_SIZE = 44
 
-dice_x = 0
-dice_y = 0
-dice_angle = 0
-current_img = None
-start_pos = None
-dragging = True
-moved = False
-final_num = 3
+
+root = tk.Tk()
+root.overrideredirect(True)
+root.config(bg=BG_COLOR)
+root.wm_attributes("-transparentcolor", BG_COLOR)
+
+screen_w = root.winfo_screenwidth()
+screen_h = root.winfo_screenheight()
+root.geometry(f"{screen_w}x{screen_h}+0+0")
+
+canvas = tk.Canvas(root, bg=BG_COLOR, highlightthickness=0)
+canvas.pack(fill="both", expand=True)
+
+
+dice_x = screen_w // 2
+dice_y = screen_h - 70
 last_dx = 0
 last_dy = 0
-jump = False
+dice_angle = 0
+final_num = 3
+ground = screen_h - 70
+
+current_img = None
+start_pos = None
+dragging = False
+r_animate = False
+m_animate = False
 
 last_time = time.time()
+time_scale = 1.0
 
 
 def dice_image(num, angle=0):
@@ -72,18 +89,22 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_item, current_img, dice_x, dice_y, dragging, moved, jump, last_dx, last_dy, dice_angle, final_num, last_time
-    final_num = 3
-    current_img = dice_image(final_num)
-    dragging = True
-    moved = False
-    jump = False
-    last_dx = 0
-    last_dy = 0
+    global dice_x, dice_y, last_dx, last_dy, dice_angle, final_num, ground, current_img, dice_item, dragging, r_animate, m_animate
+
     dice_x = screen_w // 2
     dice_y = screen_h - 70
+    last_dx = 0
+    last_dy = 0
     dice_angle = 0
+    final_num = 3
+    ground = screen_h - 70
+
+    current_img = dice_image(final_num)
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
+
+    dragging = False
+    r_animate = False
+    m_animate = False
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
     canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
@@ -94,15 +115,13 @@ def reset(event=None):
 
 
 def start_drag(event):
-    global start_pos, dragging, last_dx, last_dy
+    global start_pos, dragging
     start_pos = (event.x, event.y)
-    dragging = False
 
 
 def on_drag(event):
-    global start_pos, dragging, dice_x, dice_y, last_dx, last_dy, moved, jump, dice_angle, current_img
-    moved = True
-    jump = False
+    global dice_x, dice_y, last_dx, last_dy, start_pos, dragging, r_animate
+
     if start_pos:
         dx = event.x - start_pos[0]
         dy = event.y - start_pos[1]
@@ -117,82 +136,132 @@ def on_drag(event):
             last_dy = dy
 
             speed = math.hypot(dx, dy)
-            if speed > 30:
-                current_img = dice_image(final_num, dice_angle)
-                canvas.itemconfig(dice_item, image=current_img)
-                dice_angle += 30
+            if speed > 50 and r_animate == False:
+                r_animate = True
+                d = random.choice([-25, 25])
+                rotate_animation(d)
 
         else:
             last_dx = 0
             last_dy = 0
 
 
+def rotate_animation(d):
+    global dice_angle, current_img, r_animate
+
+    current_img = dice_image(final_num, dice_angle)
+    canvas.itemconfig(dice_item, image=current_img)
+    dice_angle += d
+
+    if dragging:
+        canvas.after(10, rotate_animation, d)
+    else:
+        r_animate = False
+
+
 def roll_dice_random(event=None):
-    global final_num
+    global final_num, dragging, last_time
+
+    if m_animate:
+        return
+
+    last_time = time.time()
     final_num = random.randint(1, 6)
-    roll_dice(event)
+    d = random.choice([-25, 25])
+    vx = last_dx if dragging else 0
+    vy = last_dy if dragging else -175
+
+    dragging = False
+    main_animation(vx, vy, final_num, d, dice_angle)
 
 
 def roll_dice_6(event=None):
-    global final_num
+    global final_num, dragging, last_time
+
+    if m_animate:
+        return
+
+    last_time = time.time()
     final_num = 6
-    roll_dice(event)
+    d = random.choice([-25, 25])
+    vx = last_dx if dragging else 0
+    vy = last_dy if dragging else -175
+
+    dragging = False
+    main_animation(vx, vy, final_num, d, dice_angle)
 
 
 def key_pressed(event):
-    global final_num, dragging, jump
-    if dragging or jump:
+    global final_num, last_time
+
+    if m_animate:
         return
 
-    dragging = False
     key = event.keysym.lower()
+    last_time = time.time()
+    final_num = random.randint(1, 6)
+    d = random.choice([-25, 25])
+    vx = 0
+    vy = -175
 
-    if key in ["1", "2", "3", "4", "5", "6"]:
+    if key == "w":
+        pass
+    elif key == "a":
+        vx = -200
+        vy = -50
+    elif key == "s":
+        vy = 0
+    elif key == "d":
+        vx = 200
+        vy = -50
+    elif key == "q":
+        vx = -100
+        vy = -125
+    elif key == "e":
+        vx = 100
+        vy = -125
+
+    elif key in ["1", "2", "3", "4", "5", "6"]:
         final_num = int(key)
-    elif key == "r" or key == "space":
-        final_num = random.randint(1, 6)
+    elif key == "r":
+        reset()
+        return
+    elif key == "f":
+        final_num = 6
+    elif key == "t":
+        vx = random.randint(-2000, 2000)
+        vy = random.randint(-1000, -500)
+    elif key == "g":
+        pass
     else:
         return
 
-    roll_dice()
+    main_animation(vx, vy, final_num, d, dice_angle)
 
 
-def roll_dice(event=None):
-    global dragging, dice_y, final_num, last_dx, last_dy, moved, jump, dice_angle, last_time
-
-    last_time = time.time() if dragging else 0
-    vx = last_dx if dragging else 0
-    vy = last_dy if dragging else -80
-    ground = screen_h - 70 if moved else dice_y
-    d = random.choice([-25, 25])
-
-    jump = False if dragging else True
-    dragging = False
-    animate(dice_y, vx, vy, final_num, d, ground, dice_angle)
-
-
-def animate(y, vx, vy, num, d, ground, angle=0):
-    global current_img, dice_x, dice_y, dragging, jump, last_time
+def main_animation(vx, vy, num, d, angle):
+    global dice_x, dice_y, current_img, m_animate, last_time, time_scale
 
     if dragging:
+        m_animate = False
         return
 
-    dt = 1
-    if last_time != 0:
-        now = time.time()
-        dt = (now - last_time) * 33
-        last_time = now
+    m_animate = True
+    now = time.time()
+    dt = (now - last_time) * 33 * time_scale
+    last_time = now
 
     g = 9.8
     restitution = 0.6
     friction = 0.5
-    left_wall = 22
+
+    left_wall = DICE_SIZE / 2
     right_wall = screen_w - left_wall
-    ceiling = 0
+    ceiling = DICE_SIZE / 2
 
     dice_x += vx * dt
     vy += g * dt
-    y += vy * dt
+    dice_y += vy * dt
     angle += d * dt
 
     if dice_x <= left_wall or dice_x >= right_wall:
@@ -203,44 +272,44 @@ def animate(y, vx, vy, num, d, ground, angle=0):
         vx = -vx * restitution
         vy = vy * friction
 
-    if y <= ceiling:
-        y = ceiling
+    if dice_y <= ceiling:
+        dice_y = ceiling
         vx = vx * friction
         vy = -vy * restitution
 
-    if y >= ground:
+    if dice_y >= ground:
         vx = vx * friction
         vy = -vy * restitution
-        y = ground
+        dice_y = ground
         if abs(vy) + abs(vx) * 0.1 < 5:
-            jump = False
+            m_animate = False
             dice_y = ground
             canvas.coords(dice_item, dice_x, dice_y)
             current_img = dice_image(num)
             canvas.itemconfig(dice_item, image=current_img)
             return
 
-    canvas.coords(dice_item, dice_x, y)
+    canvas.coords(dice_item, dice_x, dice_y)
     current_img = dice_image(random.randint(1, 6), angle)
     canvas.itemconfig(dice_item, image=current_img)
-    root.after(16, lambda: animate(y, vx, vy, num, d, ground, angle))
+    root.after(16, lambda: main_animation(vx, vy, num, d, angle))
 
 
-root = tk.Tk()
-root.overrideredirect(True)
-root.config(bg=BG_COLOR)
-root.wm_attributes("-transparentcolor", BG_COLOR)
+def slow_motion_on(event=None):
+    global time_scale
+    time_scale = 0.25
 
-screen_w = root.winfo_screenwidth()
-screen_h = root.winfo_screenheight()
-root.geometry(f"{screen_w}x{screen_h}+0+0")
 
-canvas = tk.Canvas(root, bg=BG_COLOR, highlightthickness=0)
-canvas.pack(fill="both", expand=True)
+def slow_motion_off(event=None):
+    global time_scale
+    time_scale = 1.0
+
 
 reset()
 
 root.bind("<Key>", key_pressed)
 root.bind("<Control-r>", reset)
 root.bind("<ButtonPress-2>", reset)
+root.bind("<KeyPress-space>", slow_motion_on)
+root.bind("<KeyRelease-space>", slow_motion_off)
 root.mainloop()
