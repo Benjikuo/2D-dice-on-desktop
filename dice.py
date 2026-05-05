@@ -166,8 +166,6 @@ def rotate_animation(d):
 def roll_dice_random(event=None):
     global vx, vy, final_num, dragging, last_time
 
-    stop_main_animation()
-
     final_num = random.randint(1, 6)
     last_time = time.time()
     d = random.choice([-25, 25])
@@ -175,13 +173,13 @@ def roll_dice_random(event=None):
     vy = last_dy if dragging else -175
 
     dragging = False
+
+    stop_main_animation()
     main_animation(final_num, d, dice_angle)
 
 
 def roll_dice_6(event=None):
     global vx, vy, final_num, dragging, last_time
-
-    stop_main_animation()
 
     final_num = 6
     last_time = time.time()
@@ -190,6 +188,8 @@ def roll_dice_6(event=None):
     vy = last_dy if dragging else -175
 
     dragging = False
+
+    stop_main_animation()
     main_animation(final_num, d, dice_angle)
 
 
@@ -197,7 +197,6 @@ def key_pressed(event):
     global vx, vy, final_num, last_time
 
     key = event.keysym.lower()
-    stop_main_animation()
 
     final_num = random.randint(1, 6)
     last_time = time.time()
@@ -240,6 +239,7 @@ def key_pressed(event):
     else:
         return
 
+    stop_main_animation()
     main_animation(final_num, d, dice_angle)
 
 
