@@ -24,14 +24,16 @@ dice_y = screen_h - 70
 last_dx = 0
 last_dy = 0
 dice_angle = 0
+vx = 0
+vy = 0
 final_num = 3
 ground = screen_h - 70
 
 current_img = None
 start_pos = None
+m_animate_id = None
 dragging = False
 r_animate = False
-m_animate = False
 
 last_time = time.time()
 time_scale = 1.0
@@ -89,22 +91,24 @@ def dice_image(num, angle=0):
 
 
 def reset(event=None):
-    global dice_x, dice_y, last_dx, last_dy, dice_angle, final_num, ground, current_img, dice_item, dragging, r_animate, m_animate
+    global dice_x, dice_y, last_dx, last_dy, dice_angle, vx, vy, final_num, ground, current_img, dice_item, m_animate_id, dragging, r_animate
 
     dice_x = screen_w // 2
     dice_y = screen_h - 70
     last_dx = 0
     last_dy = 0
     dice_angle = 0
+    vx = 0
+    vy = 0
     final_num = 3
     ground = screen_h - 70
 
     current_img = dice_image(final_num)
     dice_item = canvas.create_image(dice_x, dice_y, image=current_img)
+    m_animate_id = None
 
     dragging = False
     r_animate = False
-    m_animate = False
 
     canvas.tag_bind(dice_item, "<ButtonPress-1>", start_drag)
     canvas.tag_bind(dice_item, "<B1-Motion>", on_drag)
@@ -160,66 +164,63 @@ def rotate_animation(d):
 
 
 def roll_dice_random(event=None):
-    global final_num, dragging, last_time
+    global vx, vy, final_num, dragging, last_time
 
-    if m_animate:
-        return
+    stop_main_animation()
 
-    last_time = time.time()
     final_num = random.randint(1, 6)
+    last_time = time.time()
     d = random.choice([-25, 25])
     vx = last_dx if dragging else 0
     vy = last_dy if dragging else -175
 
     dragging = False
-    main_animation(vx, vy, final_num, d, dice_angle)
+    main_animation(final_num, d, dice_angle)
 
 
 def roll_dice_6(event=None):
-    global final_num, dragging, last_time
+    global vx, vy, final_num, dragging, last_time
 
-    if m_animate:
-        return
+    stop_main_animation()
 
-    last_time = time.time()
     final_num = 6
+    last_time = time.time()
     d = random.choice([-25, 25])
     vx = last_dx if dragging else 0
     vy = last_dy if dragging else -175
 
     dragging = False
-    main_animation(vx, vy, final_num, d, dice_angle)
+    main_animation(final_num, d, dice_angle)
 
 
 def key_pressed(event):
-    global final_num, last_time
-
-    if m_animate:
-        return
+    global vx, vy, final_num, last_time
 
     key = event.keysym.lower()
-    last_time = time.time()
+    stop_main_animation()
+
     final_num = random.randint(1, 6)
+    last_time = time.time()
     d = random.choice([-25, 25])
-    vx = 0
-    vy = -175
 
     if key == "w":
-        pass
+        vx += 0
+        vy += -175
     elif key == "a":
-        vx = -200
-        vy = -50
+        vx += -200
+        vy += -50
     elif key == "s":
-        vy = 0
+        vx += 0
+        vy += 175
     elif key == "d":
-        vx = 200
-        vy = -50
+        vx += 200
+        vy += -50
     elif key == "q":
-        vx = -100
-        vy = -125
+        vx += -100
+        vy += -125
     elif key == "e":
-        vx = 100
-        vy = -125
+        vx += 100
+        vy += -125
 
     elif key in ["1", "2", "3", "4", "5", "6"]:
         final_num = int(key)
@@ -228,25 +229,26 @@ def key_pressed(event):
         return
     elif key == "f":
         final_num = 6
+        vx += 0
+        vy += -175
     elif key == "t":
-        vx = random.randint(-2000, 2000)
-        vy = random.randint(-1000, -500)
+        vx = random.randint(-1800, 1800)
+        vy = random.randint(-1000, 1000)
     elif key == "g":
-        pass
+        vx += 0
+        vy += -175
     else:
         return
 
-    main_animation(vx, vy, final_num, d, dice_angle)
+    main_animation(final_num, d, dice_angle)
 
 
-def main_animation(vx, vy, num, d, angle):
-    global dice_x, dice_y, current_img, m_animate, last_time, time_scale
+def main_animation(num, d, angle):
+    global dice_x, dice_y, vx, vy, current_img, m_animate_id, last_time, time_scale
 
     if dragging:
-        m_animate = False
         return
 
-    m_animate = True
     now = time.time()
     dt = (now - last_time) * 33 * time_scale
     last_time = now
@@ -282,7 +284,6 @@ def main_animation(vx, vy, num, d, angle):
         vy = -vy * restitution
         dice_y = ground
         if abs(vy) + abs(vx) * 0.1 < 5:
-            m_animate = False
             dice_y = ground
             canvas.coords(dice_item, dice_x, dice_y)
             current_img = dice_image(num)
@@ -292,7 +293,19 @@ def main_animation(vx, vy, num, d, angle):
     canvas.coords(dice_item, dice_x, dice_y)
     current_img = dice_image(random.randint(1, 6), angle)
     canvas.itemconfig(dice_item, image=current_img)
-    root.after(16, lambda: main_animation(vx, vy, num, d, angle))
+    m_animate_id = root.after(16, lambda: main_animation(num, d, angle))
+
+
+def stop_main_animation():
+    global m_animate_id
+
+    if m_animate_id is not None:
+        try:
+            root.after_cancel(m_animate_id)
+        except tk.TclError:
+            pass
+
+        m_animate_id = None
 
 
 def slow_motion_on(event=None):
