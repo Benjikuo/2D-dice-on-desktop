@@ -6,7 +6,7 @@
 A small dice on desktop which can be thrown by clicking or dragging it.  
 
 <p>
-  <img src="https://raw.githubusercontent.com/Benjikuo/2D-dice-on-desktop/refs/heads/main/image/drag_animation.gif" width="830">
+  <img src="https://raw.githubusercontent.com/Benjikuo/2D-dice-on-desktop/refs/heads/main/image/wasd_update.gif" width="830">
 </p>
 
 <br>
@@ -57,13 +57,21 @@ python dice.py
 
 ## 💻 Keyboard and Mouse Controls
 | Action         | Mouse / Key             | Description       |
-|----------------| ------------------------|-------------------|
-| 🎲 Roll Dice   | Left-click / R or space | Roll randomly     |
-| 🎯 Roll 6      | Right-click / 6         | Always land on 6  |
-| 🔢 Roll number | 1 ~ 6                   | Land on 1 ~ 6     |
-| 👆🏻 Drag        | Hold & move             | Move the dice     |
-| 🔁 Reset       | Middle-click / Ctrl + R | Reset position    |
-| ❌ Exit        | Alt + F4                | Close the program |
+| -------------- | ----------------------- | ----------------- |
+| 👆🏻 Drag           | Hold & move                  | Move the dice |
+| 🎲 Roll Dice      | Left-click / G               | Roll randomly |
+| 🎯 Roll 6         | Right-click / F              | Always land on 6 |
+| 💨 Random Throw   | T                            | Throw the dice in a random direction |
+| 🔢 Roll Number    | Number keys 1 ~ 6            | Land on 1 ~ 6 |
+| ⬆️ Jump           | W                            | Throw the dice upward |
+| ⬅️ Move Left      | A                            | Throw the dice left |
+| ⬇️ Move Down      | S                            | Throw the dice downward |
+| ➡️ Move Right     | D                            | Throw the dice right |
+| ↖️ Throw Up-Left  | Q                            | Throw the dice up-left |
+| ↗️ Throw Up-Right | E                            | Throw the dice up-right |
+| 🔁 Reset          | Middle-click / R or Ctrl + R | Reset position |
+| 🐢 Slow Motion    | Hold Space                   | Slow down the dice motion |
+| ❌ Exit           | Alt + F4                     | Close the program |
 
 <br>
 
