@@ -59,10 +59,10 @@ python dice.py
 | Action         | Mouse / Key             | Description       |
 | -------------- | ----------------------- | ----------------- |
 | 👆🏻 Drag           | Hold & move                  | Move the dice |
-| 🎲 Roll Dice      | Left-click / G               | Roll randomly |
-| 🎯 Roll 6         | Right-click / F              | Always land on 6 |
+| 🎲 Roll Dice      | Left-click / G               | Roll and land on a random number |
+| 🎯 Roll 6         | Right-click / F              | Roll the die and always land on 6 |
 | 💨 Random Throw   | T                            | Throw the dice in a random direction |
-| 🔢 Roll Number    | Number keys 1 ~ 6            | Land on 1 ~ 6 |
+| 🔢 Set Number     | Number keys 1 ~ 6            | Set the final number; change instantly if already landed |
 | ⬆️ Jump           | W                            | Throw the dice upward |
 | ⬅️ Move Left      | A                            | Throw the dice left |
 | ⬇️ Move Down      | S                            | Throw the dice downward |
